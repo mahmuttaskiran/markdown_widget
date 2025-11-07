@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
+void main() {
+  runApp(const MaterialApp(
+    home: WordTapExample(),
+  ));
+}
+
 /// Example demonstrating the onTapWord callback and word highlighting functionality
 class WordTapExample extends StatefulWidget {
   const WordTapExample({Key? key}) : super(key: key);
@@ -37,16 +43,16 @@ Try tapping on *different* words like **bold**, *italic*, or `code` to see the h
 
 ## Features
 
-- Tap any word in a paragraph to highlight it
+- Tap any word in any markdown element to highlight it
 - Custom highlight styling (background color, font weight, etc.)
 - Preserves formatting (bold, italic, code)
 - Maintains text layout and spacing
 - Works with markdown links and other inline elements
-- **NEW**: Word tapping also works in list items!
+- **NEW**: Word tapping now works in ALL text-containing elements!
 
-### List Examples
+### Works Everywhere
 
-Tap on words in these lists:
+Tap on words in these different elements:
 
 - This is a **bulleted** list item
 - You can tap any `word` here
@@ -56,31 +62,12 @@ Tap on words in these lists:
 2. Try tapping `different` words
 3. Highlighting works in *ordered* lists too
 
-> Note: Word tapping and highlighting now works in both paragraphs and list items!
-''';
+> This is a blockquote. Try tapping on any word here! Even in **blockquotes**, the word tap functionality works perfectly.
 
-    // Create a custom config with onTapWord callback and highlighting
-    final config = MarkdownConfig.defaultConfig.copy(
-      configs: [
-        PConfig(
-          textStyle: const TextStyle(fontSize: 16),
-          onTapWord: _onWordTap,
-          highlightStyle: const TextStyle(
-            backgroundColor: Colors.yellow,
-            fontWeight: FontWeight.bold,
-          ),
-          highlightedWord: lastTappedWord,
-        ),
-        ListConfig(
-          onTapWord: _onWordTap,
-          highlightStyle: const TextStyle(
-            backgroundColor: Colors.yellow,
-            fontWeight: FontWeight.bold,
-          ),
-          highlightedWord: lastTappedWord,
-        ),
-      ],
-    );
+#### Headings Are Tappable Too!
+
+Tap on words in headings, paragraphs, lists, and blockquotes - everything is now tappable with just a single configuration at the MarkdownWidget level!
+''';
 
     return Scaffold(
       appBar: AppBar(
@@ -103,12 +90,18 @@ Tap on words in these lists:
           ),
 
           // Markdown content with word tap functionality
+          // Note: No custom config needed! Just pass the callbacks directly to MarkdownWidget
           Expanded(
             child: MarkdownWidget(
               data: markdownData,
-              config: config,
               padding: const EdgeInsets.all(16),
               selectable: false,
+              onTapWord: _onWordTap,
+              highlightStyle: const TextStyle(
+                backgroundColor: Colors.yellow,
+                fontWeight: FontWeight.bold,
+              ),
+              highlightedWord: lastTappedWord,
             ),
           ),
         ],

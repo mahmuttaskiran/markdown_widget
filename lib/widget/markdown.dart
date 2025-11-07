@@ -31,6 +31,15 @@ class MarkdownWidget extends StatefulWidget {
   ///config for [MarkdownGenerator]
   final MarkdownGenerator? markdownGenerator;
 
+  ///callback for word tap events in all text-containing elements
+  final ValueCallback<String>? onTapWord;
+
+  ///style for highlighted words in all text-containing elements
+  final TextStyle? highlightStyle;
+
+  ///the currently highlighted word in all text-containing elements
+  final String? highlightedWord;
+
   const MarkdownWidget({
     Key? key,
     required this.data,
@@ -41,6 +50,9 @@ class MarkdownWidget extends StatefulWidget {
     this.padding,
     this.config,
     this.markdownGenerator,
+    this.onTapWord,
+    this.highlightStyle,
+    this.highlightedWord,
   }) : super(key: key);
 
   @override
@@ -86,6 +98,9 @@ class MarkdownWidgetState extends State<MarkdownWidget> {
         _tocController?.setTocList(tocList);
       },
       config: widget.config,
+      onTapWord: widget.onTapWord,
+      highlightStyle: widget.highlightStyle,
+      highlightedWord: widget.highlightedWord,
     );
     _widgets.addAll(result);
   }

@@ -45,7 +45,11 @@ class MarkdownGenerator {
   ///convert [data] to widgets
   ///[onTocList] can provider [Toc] list
   List<Widget> buildWidgets(String data,
-      {ValueCallback<List<Toc>>? onTocList, MarkdownConfig? config}) {
+      {ValueCallback<List<Toc>>? onTocList,
+      MarkdownConfig? config,
+      ValueCallback<String>? onTapWord,
+      TextStyle? highlightStyle,
+      String? highlightedWord}) {
     final mdConfig = config ?? MarkdownConfig.defaultConfig;
     final m.Document document = m.Document(
       extensionSet: extensionSet ?? m.ExtensionSet.gitHubFlavored,
@@ -63,6 +67,9 @@ class MarkdownGenerator {
         textGenerator: textGenerator,
         richTextBuilder: richTextBuilder,
         splitRegExp: regExp,
+        onTapWord: onTapWord,
+        highlightStyle: highlightStyle,
+        highlightedWord: highlightedWord,
         onNodeAccepted: (node, index) {
           onNodeAccepted?.call(node, index);
           if (node is HeadingNode && headingNodeFilter(node)) {

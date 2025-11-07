@@ -37,6 +37,15 @@ class WidgetVisitor implements m.NodeVisitor {
   ///use [splitRegExp] to split markdown data
   final RegExp? splitRegExp;
 
+  ///callback for word tap events in all text-containing elements
+  final ValueCallback<String>? onTapWord;
+
+  ///style for highlighted words in all text-containing elements
+  final TextStyle? highlightStyle;
+
+  ///the currently highlighted word in all text-containing elements
+  final String? highlightedWord;
+
   static RegExp defaultSplitRegExp = RegExp(r'(\r?\n)|(\r)');
 
   WidgetVisitor({
@@ -46,6 +55,9 @@ class WidgetVisitor implements m.NodeVisitor {
     this.textGenerator,
     this.richTextBuilder,
     this.splitRegExp,
+    this.onTapWord,
+    this.highlightStyle,
+    this.highlightedWord,
   }) {
     this.config = config ?? MarkdownConfig.defaultConfig;
     for (var e in generators) {
@@ -101,6 +113,40 @@ class WidgetVisitor implements m.NodeVisitor {
   }
 
   SpanNode _createTextNode(m.Text text, ElementNode parent) {
+    // Check if global word tap functionality is enabled
+    if (onTapWord != null) {
+      // Check for config-specific overrides (backwards compatibility)
+      if (parent is ParagraphNode && parent.pConfig.onTapWord != null) {
+        return TappableTextNode(
+          text: text.text,
+          style: config.p.textStyle,
+          onTapWord: parent.pConfig.onTapWord,
+          highlightStyle: parent.pConfig.highlightStyle,
+          highlightedWord: parent.pConfig.highlightedWord,
+        );
+      }
+
+      if (parent is ListNode && config.li.onTapWord != null) {
+        return TappableTextNode(
+          text: text.text,
+          style: config.p.textStyle,
+          onTapWord: config.li.onTapWord,
+          highlightStyle: config.li.highlightStyle,
+          highlightedWord: config.li.highlightedWord,
+        );
+      }
+
+      // Apply global word tap functionality to all text-containing elements
+      return TappableTextNode(
+        text: text.text,
+        style: config.p.textStyle,
+        onTapWord: onTapWord,
+        highlightStyle: highlightStyle,
+        highlightedWord: highlightedWord,
+      );
+    }
+
+    // Legacy: check for config-specific word tap (backwards compatibility)
     if (parent is ParagraphNode && parent.pConfig.onTapWord != null) {
       return TappableTextNode(
         text: text.text,
