@@ -7,12 +7,11 @@ void main() {
     test('should create tappable spans for words', () {
       final node = TappableTextNode(
         text: 'Hello world test',
-        onTapWord: (word) {},
+        onSelectionChanged: (_) {},
       );
 
       final span = node.build() as TextSpan;
 
-      // Should create a TextSpan with children (words + spaces)
       expect(span.children, isNotNull);
       expect(span.children!.length, greaterThan(0));
     });
@@ -20,7 +19,7 @@ void main() {
     test('should split text correctly preserving whitespace', () {
       final node = TappableTextNode(
         text: 'Hello  world\ttest\n',
-        onTapWord: (word) {},
+        onSelectionChanged: (_) {},
       );
 
       final parts = node.splitTextWithSpaces('Hello  world\ttest\n');
@@ -38,7 +37,7 @@ void main() {
     test('should handle punctuation in words', () {
       final node = TappableTextNode(
         text: 'Hello, world! How are you?',
-        onTapWord: (word) {},
+        onSelectionChanged: (_) {},
       );
 
       final parts = node.splitTextWithSpaces('Hello, world! How are you?');
@@ -59,14 +58,60 @@ void main() {
     test('should fallback to regular TextSpan when no callback', () {
       final node = TappableTextNode(
         text: 'Hello world',
-        onTapWord: null,
+        onSelectionChanged: null,
+        highlightedWords: null,
       );
 
       final span = node.build() as TextSpan;
 
-      // Should create a simple TextSpan without children
       expect(span.children, isNull);
       expect(span.toPlainText(), equals('Hello world'));
+    });
+
+    test('should create WidgetSpan children when selection callback is set', () {
+      final node = TappableTextNode(
+        text: 'Hello world',
+        onSelectionChanged: (_) {},
+      );
+
+      final span = node.build() as TextSpan;
+      expect(span.children, isNotNull);
+
+      final hasWidgetSpan = span.children!.any((c) => c is WidgetSpan);
+      expect(hasWidgetSpan, isTrue);
+    });
+
+    test('should highlight words from highlightedWords set', () {
+      final node = TappableTextNode(
+        text: 'Hello world',
+        onSelectionChanged: (_) {},
+        highlightedWords: {'hello', 'world'},
+        highlightStyle: const TextStyle(backgroundColor: Color(0xFFFFFF00)),
+      );
+
+      final span = node.build() as TextSpan;
+      expect(span.children, isNotNull);
+
+      final widgetSpans = span.children!.whereType<WidgetSpan>().toList();
+      expect(widgetSpans.length, equals(2));
+    });
+
+    test('should have both tap and long press on word spans', () {
+      final node = TappableTextNode(
+        text: 'Hello world',
+        onSelectionChanged: (_) {},
+      );
+
+      final span = node.build() as TextSpan;
+      expect(span.children, isNotNull);
+
+      final widgetSpans = span.children!.whereType<WidgetSpan>().toList();
+      expect(widgetSpans.isNotEmpty, isTrue);
+
+      final firstWordSpan = widgetSpans.first;
+      final gestureDetector = firstWordSpan.child as GestureDetector;
+      expect(gestureDetector.onTap, isNotNull);
+      expect(gestureDetector.onLongPress, isNotNull);
     });
   });
 }

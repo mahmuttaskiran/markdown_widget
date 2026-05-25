@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 ///the basic node
@@ -65,44 +64,94 @@ class TextNode extends SpanNode {
   InlineSpan build() => TextSpan(text: text, style: style?.merge(parentStyle));
 }
 
-///text node that supports word-level tap detection
+///text node that supports word-level tap detection with adjacency-aware multi-selection
 class TappableTextNode extends SpanNode {
   final String text;
-  final void Function(String)? onTapWord;
+  final ValueChanged<Set<String>>? onSelectionChanged;
   final TextStyle? highlightStyle;
-  final String? highlightedWord;
+  final Set<String>? highlightedWords;
 
   TappableTextNode({
     this.text = '',
     TextStyle? style,
-    this.onTapWord,
+    this.onSelectionChanged,
     this.highlightStyle,
-    this.highlightedWord,
+    this.highlightedWords,
   }) {
     this.style = style ?? const TextStyle();
   }
 
+  /// Cached ordered list of word parts (non-whitespace) from the text
+  List<String>? _orderedWords;
+
+  List<String> get _words {
+    _orderedWords ??= splitTextWithSpaces(text)
+        .where((p) => p.trim().isNotEmpty)
+        .toList();
+    return _orderedWords!;
+  }
+
   @override
   InlineSpan build() {
-    if (onTapWord == null) {
+    if (onSelectionChanged == null) {
       return TextSpan(text: text, style: style?.merge(parentStyle));
     }
 
-    // Split text into words and spaces, preserving whitespace
     final parts = splitTextWithSpaces(text);
     final List<InlineSpan> spans = [];
 
     for (final part in parts) {
       if (part.trim().isEmpty) {
-        // This is whitespace, add as non-tappable
         spans.add(TextSpan(text: part, style: style?.merge(parentStyle)));
       } else {
-        // This is a word, make it tappable
         spans.add(_createTappableWordSpan(part));
       }
     }
 
     return TextSpan(children: spans);
+  }
+
+  /// Handles a word tap with adjacency logic:
+  /// - If the tapped word is adjacent (immediately before/after) any
+  ///   currently selected word in this text node, it adds to the selection.
+  /// - Otherwise, replaces the selection with just the tapped word.
+  void _handleWordTap(String word) {
+    final currentSelection = highlightedWords ?? <String>{};
+    if (onSelectionChanged == null) return;
+
+    if (currentSelection.isEmpty) {
+      onSelectionChanged!({word});
+      return;
+    }
+
+    final bool isAdjacent = _isAdjacentToSelection(word, currentSelection);
+
+    if (isAdjacent) {
+      final newSelection = Set<String>.from(currentSelection)..add(word);
+      onSelectionChanged!(newSelection);
+    } else {
+      onSelectionChanged!({word});
+    }
+  }
+
+  /// Handles a long press: resets selection to just the pressed word
+  void _handleLongPress(String word) {
+    onSelectionChanged?.call({word});
+  }
+
+  /// Checks if [word] is positionally adjacent to any word in [selection]
+  /// by comparing positions in the ordered word list of this text node.
+  bool _isAdjacentToSelection(String word, Set<String> selection) {
+    final wordIndex = _words.indexOf(word);
+    if (wordIndex == -1) return false;
+
+    for (final selected in selection) {
+      final selectedIndex = _words.indexOf(selected);
+      if (selectedIndex != -1 && (selectedIndex - wordIndex).abs() == 1) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Splits text into words and spaces, preserving all whitespace
@@ -118,23 +167,24 @@ class TappableTextNode extends SpanNode {
     return parts;
   }
 
-  /// Creates a tappable TextSpan for a word
-  TextSpan _createTappableWordSpan(String word) {
-    // Check if this word should be highlighted
-    final isHighlighted = highlightedWord != null &&
-                         word.toLowerCase().trim() == highlightedWord!.toLowerCase().trim();
+  WidgetSpan _createTappableWordSpan(String word) {
+    final normalized = word.toLowerCase().trim();
+    final isHighlighted = highlightedWords != null &&
+        highlightedWords!.any((w) => w.toLowerCase().trim() == normalized);
 
-    // Apply highlight style if word is highlighted
     final baseStyle = style?.merge(parentStyle);
     final effectiveStyle = isHighlighted && highlightStyle != null
         ? baseStyle?.merge(highlightStyle!)
         : baseStyle;
 
-    return TextSpan(
-      text: word,
-      style: effectiveStyle,
-      recognizer: TapGestureRecognizer()
-        ..onTap = () => onTapWord?.call(word),
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _handleWordTap(word),
+        onLongPress: () => _handleLongPress(word),
+        child: Text(word, style: effectiveStyle),
+      ),
     );
   }
 }

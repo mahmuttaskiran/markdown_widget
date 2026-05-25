@@ -157,14 +157,14 @@ class ListConfig implements ContainerConfig {
   ///the marker widget for list
   final ListMarker? marker;
 
-  ///callback for word tap events
-  final ValueCallback<String>? onTapWord;
+  ///callback for selection changes — receives the full new selection set
+  final ValueChanged<Set<String>>? onSelectionChanged;
 
   ///style for highlighted words
   final TextStyle? highlightStyle;
 
-  ///the currently highlighted word
-  final String? highlightedWord;
+  ///the set of currently highlighted words
+  final Set<String>? highlightedWords;
 
   final RichTextBuilder? richTextBuilder;
 
@@ -172,9 +172,9 @@ class ListConfig implements ContainerConfig {
     this.marginLeft = 32.0,
     this.marginBottom = 4.0,
     this.marker,
-    this.onTapWord,
+    this.onSelectionChanged,
     this.highlightStyle,
-    this.highlightedWord,
+    this.highlightedWords,
     this.richTextBuilder,
   });
 
