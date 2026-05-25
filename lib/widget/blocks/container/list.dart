@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/configs.dart';
+import '../../../config/markdown_generator.dart';
 import '../../inlines/input.dart';
 import '../../proxy_rich_text.dart';
 import '../../span_node.dart';
@@ -43,7 +44,8 @@ class UlOrOLNode extends ElementNode {
             (index) {
               final childNode = children[index];
               return ProxyRichText(childNode.build(),
-                  richTextBuilder: visitor.richTextBuilder);
+                  richTextBuilder:
+                      config.richTextBuilder ?? visitor.richTextBuilder);
             },
           ),
         ),
@@ -95,7 +97,7 @@ class ListNode extends ElementNode {
     if (isCheckbox) {
       marker = ProxyRichText(
         children.removeAt(0).build(),
-        richTextBuilder: visitor.richTextBuilder,
+        richTextBuilder: config.li.richTextBuilder ?? visitor.richTextBuilder,
       );
     } else {
       marker = config.li.marker?.call(isOrdered, depth, index) ??
@@ -126,7 +128,8 @@ class ListNode extends ElementNode {
                     ],
                   ],
                 ),
-                richTextBuilder: visitor.richTextBuilder,
+                richTextBuilder:
+                    config.li.richTextBuilder ?? visitor.richTextBuilder,
               ),
             ),
           ],
@@ -163,6 +166,8 @@ class ListConfig implements ContainerConfig {
   ///the currently highlighted word
   final String? highlightedWord;
 
+  final RichTextBuilder? richTextBuilder;
+
   const ListConfig({
     this.marginLeft = 32.0,
     this.marginBottom = 4.0,
@@ -170,6 +175,7 @@ class ListConfig implements ContainerConfig {
     this.onTapWord,
     this.highlightStyle,
     this.highlightedWord,
+    this.richTextBuilder,
   });
 
   @nonVirtual
