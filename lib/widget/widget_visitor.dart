@@ -37,11 +37,8 @@ class WidgetVisitor implements m.NodeVisitor {
   ///use [splitRegExp] to split markdown data
   final RegExp? splitRegExp;
 
-  ///callback for word tap events in all text-containing elements
-  final ValueCallback<String>? onTapWord;
-
-  ///callback for long press on any word — typically used to reset selection
-  final ValueCallback<String>? onLongPressWord;
+  ///callback for selection changes — receives the full new selection set
+  final ValueChanged<Set<String>>? onSelectionChanged;
 
   ///style for highlighted words in all text-containing elements
   final TextStyle? highlightStyle;
@@ -58,8 +55,7 @@ class WidgetVisitor implements m.NodeVisitor {
     this.textGenerator,
     this.richTextBuilder,
     this.splitRegExp,
-    this.onTapWord,
-    this.onLongPressWord,
+    this.onSelectionChanged,
     this.highlightStyle,
     this.highlightedWords,
   }) {
@@ -117,62 +113,35 @@ class WidgetVisitor implements m.NodeVisitor {
   }
 
   SpanNode _createTextNode(m.Text text, ElementNode parent) {
-    // Check if global word tap functionality is enabled
-    if (onTapWord != null) {
-      // Check for config-specific overrides (backwards compatibility)
-      if (parent is ParagraphNode && parent.pConfig.onTapWord != null) {
-        return TappableTextNode(
-          text: text.text,
-          style: config.p.textStyle,
-          onTapWord: parent.pConfig.onTapWord,
-          onLongPressWord: parent.pConfig.onLongPressWord,
-          highlightStyle: parent.pConfig.highlightStyle,
-          highlightedWords: parent.pConfig.highlightedWords,
-        );
-      }
+    // Check if any selection callback is available (global or config-specific)
+    final selectionCallback = onSelectionChanged ??
+        (parent is ParagraphNode ? parent.pConfig.onSelectionChanged : null) ??
+        (parent is ListNode ? config.li.onSelectionChanged : null);
 
-      if (parent is ListNode && config.li.onTapWord != null) {
-        return TappableTextNode(
-          text: text.text,
-          style: config.p.textStyle,
-          onTapWord: config.li.onTapWord,
-          onLongPressWord: config.li.onLongPressWord,
-          highlightStyle: config.li.highlightStyle,
-          highlightedWords: config.li.highlightedWords,
-        );
-      }
+    if (selectionCallback != null) {
+      // Determine the effective config values, with per-element overrides
+      final effectiveCallback = parent is ParagraphNode
+          ? (parent.pConfig.onSelectionChanged ?? onSelectionChanged)
+          : parent is ListNode
+              ? (config.li.onSelectionChanged ?? onSelectionChanged)
+              : onSelectionChanged;
+      final effectiveHighlightStyle = parent is ParagraphNode
+          ? (parent.pConfig.highlightStyle ?? highlightStyle)
+          : parent is ListNode
+              ? (config.li.highlightStyle ?? highlightStyle)
+              : highlightStyle;
+      final effectiveHighlightedWords = parent is ParagraphNode
+          ? (parent.pConfig.highlightedWords ?? highlightedWords)
+          : parent is ListNode
+              ? (config.li.highlightedWords ?? highlightedWords)
+              : highlightedWords;
 
-      // Apply global word tap functionality to all text-containing elements
       return TappableTextNode(
         text: text.text,
         style: config.p.textStyle,
-        onTapWord: onTapWord,
-        onLongPressWord: onLongPressWord,
-        highlightStyle: highlightStyle,
-        highlightedWords: highlightedWords,
-      );
-    }
-
-    // Legacy: check for config-specific word tap (backwards compatibility)
-    if (parent is ParagraphNode && parent.pConfig.onTapWord != null) {
-      return TappableTextNode(
-        text: text.text,
-        style: config.p.textStyle,
-        onTapWord: parent.pConfig.onTapWord,
-        onLongPressWord: parent.pConfig.onLongPressWord,
-        highlightStyle: parent.pConfig.highlightStyle,
-        highlightedWords: parent.pConfig.highlightedWords,
-      );
-    }
-
-    if (parent is ListNode && config.li.onTapWord != null) {
-      return TappableTextNode(
-        text: text.text,
-        style: config.p.textStyle,
-        onTapWord: config.li.onTapWord,
-        onLongPressWord: config.li.onLongPressWord,
-        highlightStyle: config.li.highlightStyle,
-        highlightedWords: config.li.highlightedWords,
+        onSelectionChanged: effectiveCallback,
+        highlightStyle: effectiveHighlightStyle,
+        highlightedWords: effectiveHighlightedWords,
       );
     }
 

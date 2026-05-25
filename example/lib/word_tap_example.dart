@@ -16,43 +16,17 @@ class WordTapExample extends StatefulWidget {
 }
 
 class _WordTapExampleState extends State<WordTapExample> {
-  final Set<String> _selectedWords = {};
+  Set<String> _selectedWords = {};
 
-  void _onWordTap(String word) {
-    final normalized = word.toLowerCase().trim();
+  void _onSelectionChanged(Set<String> newSelection) {
     setState(() {
-      // Adjacency check: if we have selected words, check if the tapped
-      // word is adjacent to any of them. For simplicity, we consider a word
-      // adjacent if it shares the same "context" — the consumer can implement
-      // more sophisticated adjacency logic as needed.
-      //
-      // Here we use a simple heuristic: if the tapped word is already
-      // selected, deselect it. If the set is empty, select just this word.
-      // For multi-word selection, the consumer should track word positions.
-      if (_selectedWords.contains(normalized)) {
-        _selectedWords.remove(normalized);
-      } else {
-        _selectedWords.add(normalized);
-      }
+      _selectedWords = newSelection;
     });
 
+    final action = newSelection.length > 1 ? 'Added' : 'Selected';
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Tapped: "$word" | Selected: ${_selectedWords.length}'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
-  }
-
-  void _onLongPressWord(String word) {
-    setState(() {
-      _selectedWords.clear();
-      _selectedWords.add(word.toLowerCase().trim());
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Long press: "$word" — selection reset'),
+        content: Text('$action: ${newSelection.join(", ")}'),
         duration: const Duration(seconds: 1),
       ),
     );
@@ -117,8 +91,7 @@ Tap on words in headings, paragraphs, lists, and blockquotes - everything is now
               data: markdownData,
               padding: const EdgeInsets.all(16),
               selectable: false,
-              onTapWord: _onWordTap,
-              onLongPressWord: _onLongPressWord,
+              onSelectionChanged: _onSelectionChanged,
               highlightStyle: const TextStyle(
                 backgroundColor: Colors.yellow,
                 fontWeight: FontWeight.bold,

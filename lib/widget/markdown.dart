@@ -31,11 +31,8 @@ class MarkdownWidget extends StatefulWidget {
   ///config for [MarkdownGenerator]
   final MarkdownGenerator? markdownGenerator;
 
-  ///callback for word tap events in all text-containing elements
-  final ValueCallback<String>? onTapWord;
-
-  ///callback for long press on any word — typically used to reset selection
-  final ValueCallback<String>? onLongPressWord;
+  ///callback for selection changes — receives the full new selection set
+  final ValueChanged<Set<String>>? onSelectionChanged;
 
   ///style for highlighted words in all text-containing elements
   final TextStyle? highlightStyle;
@@ -53,8 +50,7 @@ class MarkdownWidget extends StatefulWidget {
     this.padding,
     this.config,
     this.markdownGenerator,
-    this.onTapWord,
-    this.onLongPressWord,
+    this.onSelectionChanged,
     this.highlightStyle,
     this.highlightedWords,
   }) : super(key: key);
@@ -102,8 +98,7 @@ class MarkdownWidgetState extends State<MarkdownWidget> {
         _tocController?.setTocList(tocList);
       },
       config: widget.config,
-      onTapWord: widget.onTapWord,
-      onLongPressWord: widget.onLongPressWord,
+      onSelectionChanged: widget.onSelectionChanged,
       highlightStyle: widget.highlightStyle,
       highlightedWords: widget.highlightedWords,
     );
