@@ -88,6 +88,7 @@ class ListNode extends ElementNode {
 
   @override
   InlineSpan build() {
+    TappableTextNode.injectWordContext(this);
     final space = config.li.marginLeft;
     final marginBottom = config.li.marginBottom;
     final parentStyleHeight =

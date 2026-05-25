@@ -13,6 +13,7 @@ class ParagraphNode extends ElementNode {
 
   @override
   InlineSpan build() {
+    TappableTextNode.injectWordContext(this);
     return TextSpan(
         children: List.generate(children.length, (index) {
       final child = children[index];
