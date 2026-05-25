@@ -160,11 +160,14 @@ class ListConfig implements ContainerConfig {
   ///callback for word tap events
   final ValueCallback<String>? onTapWord;
 
+  ///callback for long press on any word — typically used to reset selection
+  final ValueCallback<String>? onLongPressWord;
+
   ///style for highlighted words
   final TextStyle? highlightStyle;
 
-  ///the currently highlighted word
-  final String? highlightedWord;
+  ///the set of currently highlighted words
+  final Set<String>? highlightedWords;
 
   final RichTextBuilder? richTextBuilder;
 
@@ -173,8 +176,9 @@ class ListConfig implements ContainerConfig {
     this.marginBottom = 4.0,
     this.marker,
     this.onTapWord,
+    this.onLongPressWord,
     this.highlightStyle,
-    this.highlightedWord,
+    this.highlightedWords,
     this.richTextBuilder,
   });
 

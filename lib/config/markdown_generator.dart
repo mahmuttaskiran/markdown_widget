@@ -48,8 +48,9 @@ class MarkdownGenerator {
       {ValueCallback<List<Toc>>? onTocList,
       MarkdownConfig? config,
       ValueCallback<String>? onTapWord,
+      ValueCallback<String>? onLongPressWord,
       TextStyle? highlightStyle,
-      String? highlightedWord}) {
+      Set<String>? highlightedWords}) {
     final mdConfig = config ?? MarkdownConfig.defaultConfig;
     final m.Document document = m.Document(
       extensionSet: extensionSet ?? m.ExtensionSet.gitHubFlavored,
@@ -68,8 +69,9 @@ class MarkdownGenerator {
         richTextBuilder: richTextBuilder,
         splitRegExp: regExp,
         onTapWord: onTapWord,
+        onLongPressWord: onLongPressWord,
         highlightStyle: highlightStyle,
-        highlightedWord: highlightedWord,
+        highlightedWords: highlightedWords,
         onNodeAccepted: (node, index) {
           onNodeAccepted?.call(node, index);
           if (node is HeadingNode && headingNodeFilter(node)) {

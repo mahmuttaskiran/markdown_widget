@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 ///the basic node
@@ -69,22 +68,24 @@ class TextNode extends SpanNode {
 class TappableTextNode extends SpanNode {
   final String text;
   final void Function(String)? onTapWord;
+  final void Function(String)? onLongPressWord;
   final TextStyle? highlightStyle;
-  final String? highlightedWord;
+  final Set<String>? highlightedWords;
 
   TappableTextNode({
     this.text = '',
     TextStyle? style,
     this.onTapWord,
+    this.onLongPressWord,
     this.highlightStyle,
-    this.highlightedWord,
+    this.highlightedWords,
   }) {
     this.style = style ?? const TextStyle();
   }
 
   @override
   InlineSpan build() {
-    if (onTapWord == null) {
+    if (onTapWord == null && onLongPressWord == null) {
       return TextSpan(text: text, style: style?.merge(parentStyle));
     }
 
@@ -118,23 +119,25 @@ class TappableTextNode extends SpanNode {
     return parts;
   }
 
-  /// Creates a tappable TextSpan for a word
-  TextSpan _createTappableWordSpan(String word) {
-    // Check if this word should be highlighted
-    final isHighlighted = highlightedWord != null &&
-                         word.toLowerCase().trim() == highlightedWord!.toLowerCase().trim();
+  /// Creates a tappable WidgetSpan for a word supporting both tap and long press
+  WidgetSpan _createTappableWordSpan(String word) {
+    final normalized = word.toLowerCase().trim();
+    final isHighlighted = highlightedWords != null &&
+        highlightedWords!.any((w) => w.toLowerCase().trim() == normalized);
 
-    // Apply highlight style if word is highlighted
     final baseStyle = style?.merge(parentStyle);
     final effectiveStyle = isHighlighted && highlightStyle != null
         ? baseStyle?.merge(highlightStyle!)
         : baseStyle;
 
-    return TextSpan(
-      text: word,
-      style: effectiveStyle,
-      recognizer: TapGestureRecognizer()
-        ..onTap = () => onTapWord?.call(word),
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onTapWord?.call(word),
+        onLongPress: () => onLongPressWord?.call(word),
+        child: Text(word, style: effectiveStyle),
+      ),
     );
   }
 }

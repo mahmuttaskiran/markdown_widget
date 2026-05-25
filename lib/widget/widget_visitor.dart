@@ -40,11 +40,14 @@ class WidgetVisitor implements m.NodeVisitor {
   ///callback for word tap events in all text-containing elements
   final ValueCallback<String>? onTapWord;
 
+  ///callback for long press on any word — typically used to reset selection
+  final ValueCallback<String>? onLongPressWord;
+
   ///style for highlighted words in all text-containing elements
   final TextStyle? highlightStyle;
 
-  ///the currently highlighted word in all text-containing elements
-  final String? highlightedWord;
+  ///the set of currently highlighted words in all text-containing elements
+  final Set<String>? highlightedWords;
 
   static RegExp defaultSplitRegExp = RegExp(r'(\r?\n)|(\r)');
 
@@ -56,8 +59,9 @@ class WidgetVisitor implements m.NodeVisitor {
     this.richTextBuilder,
     this.splitRegExp,
     this.onTapWord,
+    this.onLongPressWord,
     this.highlightStyle,
-    this.highlightedWord,
+    this.highlightedWords,
   }) {
     this.config = config ?? MarkdownConfig.defaultConfig;
     for (var e in generators) {
@@ -121,8 +125,9 @@ class WidgetVisitor implements m.NodeVisitor {
           text: text.text,
           style: config.p.textStyle,
           onTapWord: parent.pConfig.onTapWord,
+          onLongPressWord: parent.pConfig.onLongPressWord,
           highlightStyle: parent.pConfig.highlightStyle,
-          highlightedWord: parent.pConfig.highlightedWord,
+          highlightedWords: parent.pConfig.highlightedWords,
         );
       }
 
@@ -131,8 +136,9 @@ class WidgetVisitor implements m.NodeVisitor {
           text: text.text,
           style: config.p.textStyle,
           onTapWord: config.li.onTapWord,
+          onLongPressWord: config.li.onLongPressWord,
           highlightStyle: config.li.highlightStyle,
-          highlightedWord: config.li.highlightedWord,
+          highlightedWords: config.li.highlightedWords,
         );
       }
 
@@ -141,8 +147,9 @@ class WidgetVisitor implements m.NodeVisitor {
         text: text.text,
         style: config.p.textStyle,
         onTapWord: onTapWord,
+        onLongPressWord: onLongPressWord,
         highlightStyle: highlightStyle,
-        highlightedWord: highlightedWord,
+        highlightedWords: highlightedWords,
       );
     }
 
@@ -152,8 +159,9 @@ class WidgetVisitor implements m.NodeVisitor {
         text: text.text,
         style: config.p.textStyle,
         onTapWord: parent.pConfig.onTapWord,
+        onLongPressWord: parent.pConfig.onLongPressWord,
         highlightStyle: parent.pConfig.highlightStyle,
-        highlightedWord: parent.pConfig.highlightedWord,
+        highlightedWords: parent.pConfig.highlightedWords,
       );
     }
 
@@ -162,8 +170,9 @@ class WidgetVisitor implements m.NodeVisitor {
         text: text.text,
         style: config.p.textStyle,
         onTapWord: config.li.onTapWord,
+        onLongPressWord: config.li.onLongPressWord,
         highlightStyle: config.li.highlightStyle,
-        highlightedWord: config.li.highlightedWord,
+        highlightedWords: config.li.highlightedWords,
       );
     }
 
