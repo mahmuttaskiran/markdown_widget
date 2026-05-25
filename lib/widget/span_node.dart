@@ -91,6 +91,14 @@ class TappableTextNode extends SpanNode {
     return _orderedWords!;
   }
 
+  /// Shared flattened word list from the parent element, enabling cross-node
+  /// adjacency when styled segments (bold, italic, code) create separate
+  /// TappableTextNode instances within the same paragraph or list item.
+  List<String>? parentWordContext;
+
+  /// Where this node's words begin in [parentWordContext].
+  int wordContextStartIndex = 0;
+
   @override
   InlineSpan build() {
     if (onSelectionChanged == null) {
@@ -139,14 +147,16 @@ class TappableTextNode extends SpanNode {
     onSelectionChanged?.call({word});
   }
 
-  /// Checks if [word] is positionally adjacent to any word in [selection]
-  /// by comparing positions in the ordered word list of this text node.
+  /// Checks if [word] is positionally adjacent to any word in [selection].
+  /// Uses [parentWordContext] (the parent's flattened word list) when set,
+  /// falling back to the local [_words] list.
   bool _isAdjacentToSelection(String word, Set<String> selection) {
-    final wordIndex = _words.indexOf(word);
+    final context = parentWordContext ?? _words;
+    final wordIndex = context.indexOf(word);
     if (wordIndex == -1) return false;
 
     for (final selected in selection) {
-      final selectedIndex = _words.indexOf(selected);
+      final selectedIndex = context.indexOf(selected);
       if (selectedIndex != -1 && (selectedIndex - wordIndex).abs() == 1) {
         return true;
       }
@@ -186,5 +196,36 @@ class TappableTextNode extends SpanNode {
         child: Text(word, style: effectiveStyle),
       ),
     );
+  }
+
+  /// Injects a shared word context into all [TappableTextNode] descendants
+  /// of [element], enabling cross-node adjacency detection for styled text
+  /// segments (bold, italic, code) that exist in separate sibling nodes.
+  static void injectWordContext(ElementNode element) {
+    final tappableNodes = <TappableTextNode>[];
+    _collectTappableTextNodes(element, tappableNodes);
+
+    if (tappableNodes.length <= 1) return;
+
+    final allWords = <String>[];
+    for (final node in tappableNodes) {
+      node.wordContextStartIndex = allWords.length;
+      allWords.addAll(node._words);
+    }
+
+    for (final node in tappableNodes) {
+      node.parentWordContext = allWords;
+    }
+  }
+
+  static void _collectTappableTextNodes(
+      SpanNode node, List<TappableTextNode> result) {
+    if (node is TappableTextNode) {
+      result.add(node);
+    } else if (node is ElementNode) {
+      for (final child in node.children) {
+        _collectTappableTextNodes(child, result);
+      }
+    }
   }
 }
