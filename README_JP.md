@@ -45,6 +45,18 @@ class MarkdownPage extends StatelessWidget {
       SingleChildScrollView(child: MarkdownBlock(data: data));
 ```
 
+## 📁 その他の例
+
+高度な使用例については、リポジトリの [example/lib/markdown_custom](https://github.com/asjqkkkk/markdown_widget/tree/dev/example/lib/markdown_custom) フォルダを参照してください：
+
+- **video.dart** - カスタムvideoタグのサポート
+- **latex.dart** - LaTeX数式レンダリング
+- **mermaid.dart** - Mermaid図のサポート（フローチャート、シーケンス図など）
+- **html_support.dart** - HTMLタグの拡張
+- **custom_node.dart** - カスタムノードの実装例
+
+これらの例は、カスタムタグと機能を使用してパッケージを拡張する方法を示しています。
+
 ## 🌠ナイトモード
 
 `markdown_widget`はデフォルトでナイトモードをサポートしています。異なる`MarkdownConfig`を使用するだけで有効にできます。
@@ -146,6 +158,53 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 例にはLaTeXの簡単なサポートも含まれており、[latex.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/latex.dart)の実装を参照することで実装できます。
 
 こちらが[オンラインlatexデモショーケース](https://asjqkkkk.github.io/markdown_widget/#/sample_latex)です。
+
+## 🔷Mermaid図サポート
+
+例にはMermaid図のサポートが含まれており、フローチャート、シーケンス図、状態図などをレンダリングできます。実装については[mermaid.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/mermaid.dart)を参照してください。
+
+機能：
+- 複数の図タイプ（フローチャート、シーケンス図、状態図、ER図など）
+- テーマサポート（自動ライト/ダークモード）
+- インタラクティブな表示モード（コードのみ、図のみ、または両方）
+- フルスクリーンビューア（パンとズームをサポート）
+- 幅の広い図の独立した水平スクロール
+- パフォーマンス最適化のためのスマートキャッシュとデバウンス
+
+こちらが[オンラインMermaidデモショーケース](https://asjqkkkk.github.io/markdown_widget/#/sample_mermaid)です。
+
+```dart
+import 'package:markdown_widget/markdown_widget.dart';
+import 'markdown_custom/mermaid.dart';
+
+// 基本的な使い方
+final isDark = Theme.of(context).brightness == Brightness.dark;
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: const MermaidConfig(),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+
+MarkdownWidget(
+  data: markdown,
+  config: config.copy(configs: [preConfig]),
+)
+
+// カスタム設定
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: MermaidConfig(
+      displayMode: MermaidDisplayMode.codeAndDiagram,
+      diagramPadding: EdgeInsets.all(16.0),
+      showLoadingIndicator: true,
+    ),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+```
 
 ## 🍑カスタムタグの実装
 

@@ -1,11 +1,10 @@
-语言：[简体中文](https://github.com/asjqkkkk/markdown_widget/blob/master/README_ZH.md) | [English](https://github.com/asjqkkkk/markdown_widget/blob/master/README.md)
+语言：[简体中文](https://github.com/asjqkkkk/markdown_widget/blob/master/README_ZH.md) | [English](https://github.com/asjqkkkk/markdown_widget/blob/master/README.md) | [日本語](https://github.com/asjqkkkk/markdown_widget/blob/master/README_JP.md)
+
+![screen](https://github.com/asjqkkkk/asjqkkkk.github.io/assets/30992818/4185bf1a-0be3-460d-ba12-9e4764f5c035)
 
 # 📖markdown_widget
 
-![screenshot](assets/script_medias/1676100926803.png)
-
-
-[![Coverage Status](assets/script_medias/1675527925332.png)](https://coveralls.io/github/asjqkkkk/markdown_widget?branch=dev) [![pub package](assets/script_medias/1675527928071.png)](https://pub.dartlang.org/packages/markdown_widget) [![demo](assets/script_medias/1675527929980.png)](https://asjqkkkk.github.io/markdown_widget/)
+[![Coverage Status](https://coveralls.io/repos/github/asjqkkkk/markdown_widget/badge.svg?branch=dev)](https://coveralls.io/github/asjqkkkk/markdown_widget?branch=dev) [![pub package](https://img.shields.io/pub/v/markdown_widget.svg)](https://pub.dartlang.org/packages/markdown_widget) [![demo](https://img.shields.io/badge/demo-online-brightgreen)](https://asjqkkkk.github.io/markdown_widget/)
 
 一个简单易用的markdown渲染组件
 
@@ -17,7 +16,7 @@
 
 在开始之前,你可以先体验一下在线 demo [点击体验](https://asjqkkkk.github.io/markdown_widget/)
 
-```dart
+```
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
@@ -35,22 +34,34 @@ class MarkdownPage extends StatelessWidget {
 
 如果你想使用自己的 Column 或者其他列表 Widget, 你可以使用 `MarkdownGenerator`
 
-```dart
+```
   Widget buildMarkdown() =>
       Column(children: MarkdownGenerator().buildWidgets(data));
 ```
 
 或者直接使用 `MarkdownBlock`
 
-```dart
+```
   Widget buildMarkdown() =>
       SingleChildScrollView(child: MarkdownBlock(data: data));
 ```
 
+## 📁 更多示例
+
+更多高级用法示例，请参考仓库中的 [example/lib/markdown_custom](https://github.com/asjqkkkk/markdown_widget/tree/dev/example/lib/markdown_custom) 文件夹：
+
+- **video.dart** - 自定义 video 标签支持
+- **latex.dart** - LaTeX 数学公式渲染
+- **mermaid.dart** - Mermaid 图表支持（流程图、时序图等）
+- **html_support.dart** - HTML 标签扩展
+- **custom_node.dart** - 自定义节点实现示例
+
+这些示例展示了如何通过自定义标签和功能来扩展本包。
+
 ## 🌠夜间模式
 
 `markdown_widget` 默认支持夜间模式，只需要使用不同的 `MarkdownConfig` 即可
-```dart
+```
   Widget buildMarkdown(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final config = isDark
@@ -70,14 +81,14 @@ class MarkdownPage extends StatelessWidget {
 
 默认模式 | 夜间模式
 ---|---
-<img src="assets/script_medias/1675527930854.png" width=400> | <img src="assets/script_medias/1675527932169.png" width=400>
+<img src="https://user-images.githubusercontent.com/30992818/211159232-92efbbb0-dd01-4970-8ff1-33a47c133b1f.png" width=400> | <img src="https://user-images.githubusercontent.com/30992818/211159236-570fca93-a5f4-403f-94ba-986272d1207e.png" width=400>
 
 
 ## 🔗链接
 
 你可以自定义链接样式和点击事件，比如下面这样
 
-```dart
+```
   Widget buildMarkdown() => MarkdownWidget(
       data: data,
       config: MarkdownConfig(configs: [
@@ -91,13 +102,14 @@ class MarkdownPage extends StatelessWidget {
           },
         )
       ]));
+      
 ```
 
 ## 📜TOC功能
 
 使用TOC非常的简单
 
-```dart
+```
   final tocController = TocController();
 
   Widget buildTocWidget() => TocWidget(controller: tocController);
@@ -119,7 +131,7 @@ class MarkdownPage extends StatelessWidget {
 ## 🎈代码高亮
 
 代码高亮支持多种主题
-```dart
+```
 import 'package:flutter_highlight/themes/a11y-light.dart';
 
   Widget buildMarkdown() => MarkdownWidget(
@@ -133,7 +145,7 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 
 支持全平台的全选和复制功能
 
-![image](assets/script_medias/1679144416355.png)
+![image](https://user-images.githubusercontent.com/30992818/226107076-f32a919e-9a0c-4138-8a0b-266c6337e0af.png)
 
 ## 🌐html 标签
 
@@ -146,6 +158,53 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 在例子中实现了对于Latex的简单支持，具体可以参考这里的实现 [latex.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/latex.dart)
 
 以及 [在线latex demo展示](https://asjqkkkk.github.io/markdown_widget/#/sample_latex)
+
+## 🔷Mermaid 图表支持
+
+示例中包含了对 Mermaid 图表的支持，可以渲染流程图、时序图、状态图等。具体实现可以参考 [mermaid.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/mermaid.dart)
+
+特性：
+- 支持多种图表类型（流程图、时序图、状态图、ER 图等）
+- 支持主题切换（自动跟随明暗模式）
+- 交互式显示模式（仅代码、仅图表、或两者）
+- 全屏查看器，支持平移和缩放
+- 宽图表独立水平滚动
+- 智能缓存和防抖，优化性能
+
+以及 [在线Mermaid demo展示](https://asjqkkkk.github.io/markdown_widget/#/sample_mermaid)
+
+```dart
+import 'package:markdown_widget/markdown_widget.dart';
+import 'markdown_custom/mermaid.dart';
+
+// 基本用法
+final isDark = Theme.of(context).brightness == Brightness.dark;
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: const MermaidConfig(),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+
+MarkdownWidget(
+  data: markdown,
+  config: config.copy(configs: [preConfig]),
+)
+
+// 自定义配置
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: MermaidConfig(
+      displayMode: MermaidDisplayMode.codeAndDiagram,
+      diagramPadding: EdgeInsets.all(16.0),
+      showLoadingIndicator: true,
+    ),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+```
 
 
 ## 🍑自定义tag与实现

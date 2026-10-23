@@ -46,6 +46,18 @@ class MarkdownPage extends StatelessWidget {
       SingleChildScrollView(child: MarkdownBlock(data: data));
 ```
 
+## 📁 更多示例
+
+更多高级用法示例，请参考仓库中的 [example/lib/markdown_custom](https://github.com/asjqkkkk/markdown_widget/tree/dev/example/lib/markdown_custom) 文件夹：
+
+- **video.dart** - 自定义 video 标签支持
+- **latex.dart** - LaTeX 数学公式渲染
+- **mermaid.dart** - Mermaid 图表支持（流程图、时序图等）
+- **html_support.dart** - HTML 标签扩展
+- **custom_node.dart** - 自定义节点实现示例
+
+这些示例展示了如何通过自定义标签和功能来扩展本包。
+
 ## 🌠夜间模式
 
 `markdown_widget` 默认支持夜间模式，只需要使用不同的 `MarkdownConfig` 即可
@@ -143,9 +155,56 @@ import 'package:flutter_highlight/themes/a11y-light.dart';
 
 ## 🧮Latex 支持
 
-在例子中实现了对于Latex的简单支持，具体可以参考这里的实现 [latex.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/latex.dart) 
+在例子中实现了对于Latex的简单支持，具体可以参考这里的实现 [latex.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/latex.dart)
 
 以及 [在线latex demo展示](https://asjqkkkk.github.io/markdown_widget/#/sample_latex)
+
+## 🔷Mermaid 图表支持
+
+示例中包含了对 Mermaid 图表的支持，可以渲染流程图、时序图、状态图等。具体实现可以参考 [mermaid.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/mermaid.dart)
+
+特性：
+- 支持多种图表类型（流程图、时序图、状态图、ER 图等）
+- 支持主题切换（自动跟随明暗模式）
+- 交互式显示模式（仅代码、仅图表、或两者）
+- 全屏查看器，支持平移和缩放
+- 宽图表独立水平滚动
+- 智能缓存和防抖，优化性能
+
+以及 [在线Mermaid demo展示](https://asjqkkkk.github.io/markdown_widget/#/sample_mermaid)
+
+```dart
+import 'package:markdown_widget/markdown_widget.dart';
+import 'markdown_custom/mermaid.dart';
+
+// 基本用法
+final isDark = Theme.of(context).brightness == Brightness.dark;
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: const MermaidConfig(),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+
+MarkdownWidget(
+  data: markdown,
+  config: config.copy(configs: [preConfig]),
+)
+
+// 自定义配置
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: MermaidConfig(
+      displayMode: MermaidDisplayMode.codeAndDiagram,
+      diagramPadding: EdgeInsets.all(16.0),
+      showLoadingIndicator: true,
+    ),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+```
 
 
 ## 🍑自定义tag与实现
