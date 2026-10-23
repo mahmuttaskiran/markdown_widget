@@ -82,7 +82,7 @@ class MarkdownWidgetState extends State<MarkdownWidget> {
   void initState() {
     super.initState();
     _tocController = widget.tocController;
-    _tocController?.jumpToIndexCallback = (index) {
+    _tocController?.jumpToWidgetIndexCallback = (index) {
       controller.scrollToIndex(index, preferPosition: AutoScrollPosition.begin);
     };
     updateState();
@@ -91,7 +91,10 @@ class MarkdownWidgetState extends State<MarkdownWidget> {
   ///when we've got the data, we need update data without setState() to avoid the flicker of the view
   void updateState() {
     indexTreeSet.clear();
-    markdownGenerator = widget.markdownGenerator ?? MarkdownGenerator();
+    markdownGenerator = widget.markdownGenerator ??
+        MarkdownGenerator(
+          inlineSyntaxList: [AutolinkNoLeadingSpaceSyntax()],
+        );
     final result = markdownGenerator.buildWidgets(
       widget.data,
       onTocList: (tocList) {
@@ -115,7 +118,7 @@ class MarkdownWidgetState extends State<MarkdownWidget> {
   void dispose() {
     clearState();
     controller.dispose();
-    _tocController?.jumpToIndexCallback = null;
+    _tocController?.jumpToWidgetIndexCallback = null;
     super.dispose();
   }
 
@@ -161,7 +164,7 @@ class MarkdownWidgetState extends State<MarkdownWidget> {
               : indexTreeSet.remove(index);
         }
         if (indexTreeSet.isNotEmpty) {
-          _tocController?.onIndexChanged(indexTreeSet.first);
+          _tocController?.notifyIndexChanged(indexTreeSet.first);
         }
       },
       child: child,

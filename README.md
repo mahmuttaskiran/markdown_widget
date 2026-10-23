@@ -1,5 +1,6 @@
 Language：[简体中文](https://github.com/asjqkkkk/markdown_widget/blob/master/README_ZH.md) | [English](https://github.com/asjqkkkk/markdown_widget/blob/master/README.md) | [日本語](https://github.com/asjqkkkk/markdown_widget/blob/master/README_JP.md)
 
+
 ![screen](https://github.com/asjqkkkk/asjqkkkk.github.io/assets/30992818/4185bf1a-0be3-460d-ba12-9e4764f5c035)
 
 # 📖markdown_widget
@@ -44,6 +45,18 @@ Or use `MarkdownBlock`
   Widget buildMarkdown() =>
       SingleChildScrollView(child: MarkdownBlock(data: data));
 ```
+
+## 📁 More Examples
+
+For advanced usage examples, check out the [example/lib/markdown_custom](https://github.com/asjqkkkk/markdown_widget/tree/dev/example/lib/markdown_custom) folder in the repository:
+
+- **video.dart** - Custom video tag support
+- **latex.dart** - LaTeX math formula rendering
+- **mermaid.dart** - Mermaid diagram support (flowcharts, sequence diagrams, etc.)
+- **html_support.dart** - HTML tag extension
+- **custom_node.dart** - Custom node implementation examples
+
+These examples demonstrate how to extend the package with custom tags and features.
 
 ## 🌠Night mode
 
@@ -146,6 +159,53 @@ Here is the [online HTML demo showcase](https://asjqkkkk.github.io/markdown_widg
 The example also includes simple support for LaTeX, which can be implemented by referring to the implementation in [latex.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/latex.dart)
 
 Here is the [online latex demo showcase](https://asjqkkkk.github.io/markdown_widget/#/sample_latex)
+
+## 🔷Mermaid diagram support
+
+The example includes support for Mermaid diagrams, which can render flowcharts, sequence diagrams, state diagrams, and more. Refer to the implementation in [mermaid.dart](https://github.com/asjqkkkk/markdown_widget/blob/dev/example/lib/markdown_custom/mermaid.dart)
+
+Features:
+- Multiple diagram types (flowchart, sequence diagram, state diagram, ER diagram, etc.)
+- Theme support (auto light/dark mode)
+- Interactive display modes (code only, diagram only, or both)
+- Fullscreen viewer with pan & zoom support
+- Independent horizontal scrolling for wide diagrams
+- Smart caching and debouncing for optimal performance
+
+Here is the [online Mermaid demo showcase](https://asjqkkkk.github.io/markdown_widget/#/sample_mermaid)
+
+```dart
+import 'package:markdown_widget/markdown_widget.dart';
+import 'markdown_custom/mermaid.dart';
+
+// Basic usage
+final isDark = Theme.of(context).brightness == Brightness.dark;
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: const MermaidConfig(),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+
+MarkdownWidget(
+  data: markdown,
+  config: config.copy(configs: [preConfig]),
+)
+
+// With custom configuration
+final preConfig = PreConfig(
+  wrapper: createMermaidWrapper(
+    config: MermaidConfig(
+      displayMode: MermaidDisplayMode.codeAndDiagram,
+      diagramPadding: EdgeInsets.all(16.0),
+      showLoadingIndicator: true,
+    ),
+    isDark: isDark,
+    preConfig: preConfig,
+  ),
+);
+```
 
 ## 🍑Custom tag implementation
 
